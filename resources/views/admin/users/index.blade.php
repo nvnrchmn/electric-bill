@@ -29,8 +29,14 @@
                 </div>
             @endif
 
-            <div class="mb-4">
+            <div class="mb-4 flex justify-between items-center">
                 <a href="{{ route('admin.users.create') }}" class="btn btn-primary">Tambah User Baru</a>
+
+                {{-- Kolom Pencarian Langsung --}}
+                <div class="form-control">
+                    <input type="text" placeholder="Cari user..." class="input input-bordered w-full md:w-auto"
+                        id="searchInput" value="{{ request('search') }}">
+                </div>
             </div>
 
             <div class="overflow-x-auto shadow-lg rounded-lg">
@@ -66,12 +72,41 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Tidak ada data user.</td>
+                                <td colspan="6" class="text-center">Tidak ada data user yang ditemukan.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{-- Paginasi --}}
+            <div class="mt-4">
+                {{ $users->links() }} {{-- Ini akan merender link paginasi --}}
+            </div>
         </div>
     </div>
+
+    {{-- Script JavaScript untuk Pencarian Langsung (Tanpa Tombol) --}}
+    @push('scripts')
+        {{-- Jika Anda menggunakan @push('scripts') di layout Anda --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchInput');
+                let typingTimer; // Timer untuk menunda pengiriman permintaan
+                const doneTypingInterval = 500; // Waktu tunda 500ms setelah mengetik berhenti
+
+                searchInput.addEventListener('keyup', function() {
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(() => {
+                        const searchValue = searchInput.value;
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('search', searchValue);
+                        currentUrl.searchParams.delete(
+                        'page'); // Reset halaman ke 1 saat pencarian baru
+                        window.location.href = currentUrl.toString();
+                    }, doneTypingInterval);
+                });
+            });
+        </script>
+    @endpush
 @endsection

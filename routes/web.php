@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\LevelController as AdminLevelController; // Import LevelController
@@ -45,23 +46,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // After login, redirect to specific dashboard based on level
-Route::get('/home', function () {
-    $user = Auth::user();
-
-    if (!$user) {
-        return redirect()->route('login');
-    }
-
-    if ($user->id_level === Level::ADMINISTRATOR_ID) {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->id_level === Level::PETUGAS_ID) {
-        return redirect()->route('petugas.dashboard');
-    } elseif ($user->id_level === Level::PELANGGAN_ID) {
-        return redirect()->route('pelanggan.dashboard');
-    }
-
-    return abort(403, 'Level user tidak diketahui');
-})->middleware('auth');
+Route::get('/home', [HomeController::class, 'index'])->middleware('auth');
 
 // Route Group for Admin
 // Pastikan Level::ADMINISTRATOR_ID sesuai dengan ID level Administrator di DB Anda

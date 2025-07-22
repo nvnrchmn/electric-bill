@@ -121,14 +121,13 @@
                             @enderror
                         </div>
 
-                        <div class="form-control mt-6">
+                        <div class="form-control mt-6 flex justify-between">
                             <button type="submit" class="btn btn-primary">Simpan Penggunaan</button>
+                            <a href="{{ route('admin.penggunaans.index') }}" class="btn btn-ghost">Kembali ke
+                                Daftar
+                                Penggunaan</a>
                         </div>
                     </form>
-                    <div class="mt-4 text-center">
-                        <a href="{{ route('admin.penggunaans.index') }}" class="btn btn-ghost">Kembali ke Daftar
-                            Penggunaan</a>
-                    </div>
                 </div>
             </div>
         </div>

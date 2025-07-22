@@ -4,35 +4,32 @@
     <div class="flex h-screen bg-base-100">
         @include('admin.sidebar')
         <div class="flex-1 p-10">
-            <h1 class="text-3xl font-bold  mb-6">Manajemen Pelanggan</h1>
+            <h1 class="text-3xl font-bold mb-6">Manajemen Pelanggan</h1>
 
-            {{-- ... alerts ... --}}
+            {{-- Alerts --}}
             @if (session('success'))
                 <div role="alert" class="alert alert-success mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
             @if (session('error'))
                 <div role="alert" class="alert alert-error mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
                     <span>{{ session('error') }}</span>
                 </div>
             @endif
 
-            <div class="mb-4">
+            <div class="mb-4 flex justify-between items-center">
                 <a href="{{ route('admin.pelanggans.create') }}" class="btn btn-primary">Tambah Pelanggan Baru</a>
+
+                {{-- Search Form --}}
+                <form action="{{ route('admin.pelanggans.index') }}" method="GET" class="flex gap-2">
+                    <input type="text" name="search" placeholder="Cari pelanggan..." value="{{ request('search') }}"
+                        class="input input-bordered" />
+                    <button type="submit" class="btn btn-secondary">Cari</button>
+                </form>
             </div>
 
-            <div class="overflow-x-auto  shadow-lg rounded-lg">
+            <div class="overflow-x-auto shadow-lg rounded-lg">
                 <table class="table w-full">
                     <thead>
                         <tr>
@@ -42,7 +39,7 @@
                             <th>Nama Pelanggan</th>
                             <th>Alamat</th>
                             <th>Daya (Tarif)</th>
-                            <th>User Terkait</th> {{-- Tambah kolom ini --}}
+                            <th>User Terkait</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -55,7 +52,7 @@
                                 <td>{{ $pelanggan->nama_pelanggan }}</td>
                                 <td>{{ $pelanggan->alamat }}</td>
                                 <td>{{ $pelanggan->tarif->daya ?? 'Tidak Diketahui' }}</td>
-                                <td>{{ $pelanggan->user->username ?? 'Belum Ditentukan' }}</td> {{-- Tampilkan username user --}}
+                                <td>{{ $pelanggan->user->username ?? 'Belum Ditentukan' }}</td>
                                 <td class="flex gap-2">
                                     <a href="{{ route('admin.pelanggans.show', $pelanggan->id_pelanggan) }}"
                                         class="btn btn-sm btn-info">Detail</a>
@@ -72,12 +69,18 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">Tidak ada data pelanggan.</td> {{-- Sesuaikan colspan --}}
+                                <td colspan="8" class="text-center">Tidak ada data pelanggan.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{-- Pagination --}}
+            <div class="mt-4">
+                {{ $pelanggans->appends(['search' => request('search')])->links() }}
+            </div>
+
         </div>
     </div>
 @endsection

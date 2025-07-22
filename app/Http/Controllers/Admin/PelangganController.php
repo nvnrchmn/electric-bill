@@ -16,10 +16,22 @@ class PelangganController extends Controller
      * Display a listing of the resource.
      * Menampilkan daftar semua pelanggan.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil semua data pelanggan dengan relasi tarif dan user yang memiliki/mengontrolnya
-        $pelanggans = Pelanggan::with(['tarif', 'user'])->get();
+        $query = Pelanggan::with(['tarif', 'user']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query
+                ->where('username', 'like', "%$search%")
+                ->orWhere('nomor_kwh', 'like', "%$search%")
+                ->orWhere('nama_pelanggan', 'like', "%$search%")
+                ->orWhere('alamat', 'like', "%$search%");
+        }
+
+        $pelanggans = $query->paginate(10);
+        $pelanggans->appends(['search' => $request->search]);
+
         return view('admin.pelanggans.index', compact('pelanggans'));
     }
 

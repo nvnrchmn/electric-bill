@@ -8,6 +8,7 @@ use App\Models\User; // Import model User
 use App\Models\Level; // Import model Level untuk dropdown
 use Illuminate\Support\Facades\Hash; // Untuk hashing password
 use Illuminate\Validation\Rule; // Untuk validasi unique kecuali diri sendiri
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -15,14 +16,31 @@ class UserController extends Controller
      * Display a listing of the resource.
      * Menampilkan daftar semua user (admin & petugas).
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua user, kecuali mungkin user dengan level 'Pelanggan'
-        // Jika pelanggan punya login terpisah, ini bisa diatur di sini
-        // $pelangganLevelId = Level::PELANGGAN_ID; // Pastikan konstanta ini ada di Level.php
-        // $users = User::where('id_level', '!=', $pelangganLevelId)->with('level')->get();
-        // Atau, jika semua user login melalui tabel users:
-        $users = User::with('level')->get(); // Ambil semua user dengan relasi level
+        $query = User::with('level');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('username', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('nama_admin', 'like', '%' . $search . '%')
+                    ->orWhereHas('level', function ($q2) use ($search) {
+                        $q2->where('nama_level', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $users = Cache::remember('users_page_' . $request->page . '_search_' . $request->search, 60, function () use ($query) {
+            return $query->paginate(10);
+        });
+
+        // Paginasi 10 item per halaman
+        // $users = $query->paginate(10);
+
+        // Menambahkan query string pencarian ke link paginasi
+        $users->appends(['search' => $request->search]);
 
         return view('admin.users.index', compact('users'));
     }
