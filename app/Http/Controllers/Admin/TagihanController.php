@@ -16,6 +16,7 @@ class TagihanController extends Controller
      */
     public function index(Request $request)
     {
+        $start = microtime(true);
         // Filter opsional untuk tagihan (mirip dengan filter penggunaan)
         // $bulan defaultnya 'm' akan menghasilkan bulan saat ini sebagai string, misal '07'
         $bulan = $request->input('bulan', date('m'));
@@ -43,6 +44,8 @@ class TagihanController extends Controller
 
         // Mengambil data tagihan setelah filter diterapkan, diurutkan
         $tagihans = $tagihansQuery->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->get();
+
+        \Log::info('Waktu ambil tagihans: ' . round(microtime(true) - $start, 5) . ' detik');
 
         // Data untuk dropdown filter bulan (lengkap)
         $months = [
@@ -110,6 +113,8 @@ class TagihanController extends Controller
      */
     public function generateTagihan(Penggunaan $penggunaan)
     {
+        $startTime = microtime(true); // Profiling waktu mulai
+        $startMemory = memory_get_usage(); // Profiling memori mulai
         // 1. Cek apakah tagihan untuk penggunaan ini sudah ada
         if ($penggunaan->tagihans()->exists()) {
             return redirect()->back()->with('error', 'Tagihan untuk penggunaan ini sudah ada.');
@@ -138,6 +143,12 @@ class TagihanController extends Controller
                 'total_tagihan' => $totalTagihan,
                 'status' => 'belum_dibayar', // Default status
             ]);
+
+            $endTime = microtime(true); // Profiling waktu selesai
+            $endMemory = memory_get_usage(); // Profiling memori selesai
+
+            \Log::info('🕒 Waktu eksekusi generateTagihan: ' . round($endTime - $startTime, 6) . ' detik');
+            \Log::info('📦 Penggunaan memori: ' . ($endMemory - $startMemory) . ' bytes');
             return redirect()->back()->with('success', 'Tagihan berhasil dibuat!');
         } catch (\Exception $e) {
             return redirect()
