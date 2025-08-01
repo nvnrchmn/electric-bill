@@ -68,8 +68,9 @@
                 </div>
                 <div></div>
                 <div></div>
-                <div class="flex justify-end">
-                    <a href="{{ route('admin.tagihans.index') }}" class="btn btn-secondary">Kembali ke Daftar Tagihan</a>
+                <div class="flex justify-end gap-2">
+                    <a href="{{ route('admin.tagihans.index') }}" class="btn btn-secondary">Kembali ke Daftar
+                        Tagihan</a>
                     {{-- Tombol aksi lain seperti "Bayar" bisa ditempatkan di sini --}}
                     @if ($tagihan->status == 'belum_dibayar')
                         <button class="btn btn-success">Bayar Tagihan</button>

@@ -42,7 +42,7 @@
                             </tr>
                             <tr>
                                 <td class="font-bold">Dicatat Oleh Petugas</td>
-                                <td>{{ $penggunaan->petugas->name ?? 'N/A' }}</td>
+                                <td>{{ $penggunaan->petugas->username ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="font-bold">Dibuat Pada</td>
